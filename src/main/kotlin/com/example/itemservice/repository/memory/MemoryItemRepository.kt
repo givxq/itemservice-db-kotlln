@@ -31,14 +31,14 @@ class MemoryItemRepository : ItemRepository {
     }
 
     override fun findAll(cond: ItemSearchCond): List<Item> {
-        val itemName: String = cond.itemName
-        val maxPrice: Int = cond.maxPrice
+        val itemName = cond.itemName
+        val maxPrice = cond.maxPrice
         return store.values.stream()
             .filter(Predicate<Item> { item: Item ->
                 if (ObjectUtils.isEmpty(itemName)) {
                     return@Predicate true
                 }
-                item.itemName.contains(itemName)
+                item.itemName.contains(itemName?:"")
             }).filter(Predicate<Item> { item: Item ->
                 if (maxPrice == null || maxPrice == 0) {
                     return@Predicate true
