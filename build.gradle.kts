@@ -29,6 +29,10 @@ dependencies {
 	testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
 	testImplementation("io.kotest:kotest-assertions-core-jvm:5.6.2")
 	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
+
+	//h2
+	implementation("com.h2database:h2")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 }
 
 tasks.withType<KotlinCompile> {

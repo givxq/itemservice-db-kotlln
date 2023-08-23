@@ -3,47 +3,70 @@ package com.example.itemservice.domain
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
+import com.example.itemservice.repository.memory.MemoryItemRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldHave
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+
+val logger = KotlinLogging.logger {  }
 
 @SpringBootTest
-@ActiveProfiles("test")
 class ItemRepositoryTest(
     @Autowired
     val itemRepository: ItemRepository
 ) : ShouldSpec({
-    should("save") {
-        val item = Item("itemA", 10000, 10)
-        itemRepository.save(item)
-        val findItem = itemRepository.findById(item.id).get()
-        item shouldBe findItem
+
+    beforeContainer {
+        logger.info { "in berforeContainer" }
+        itemRepository as MemoryItemRepository
+        itemRepository.clearStore()
     }
 
-    should("updateItem") {
-        val item = Item("item1", 10000, 10)
-        val savedItem = itemRepository.save(item)
-        val itemId = savedItem.id
+    context("save/update") {
+        should("save") {
+            val item = Item(
+                itemName = "itemA",
+                price = 10000,
+                quantity = 10)
+            itemRepository.save(item)
+            val findItem = itemRepository.findById(item.id!!).get()
+            item shouldBe findItem
+        }
 
-        val updateParam = ItemUpdateDto("item2", 20000, 30)
-        itemRepository.update(itemId, updateParam)
+        should("updateItem") {
+            val item = Item(
+                itemName = "item1",
+                price = 10000,
+                quantity = 10)
+            val savedItem = itemRepository.save(item)
+            val itemId = savedItem.id!!
 
-        val findItem = itemRepository.findById(itemId).get()
-        findItem.itemName shouldBe item.itemName
-        findItem.price shouldBe item.price
-        findItem.quantity shouldBe item.quantity
+            val updateParam = ItemUpdateDto("item2", 20000, 30)
+            itemRepository.update(itemId, updateParam)
+
+            val findItem = itemRepository.findById(itemId).get()
+            findItem.itemName shouldBe item.itemName
+            findItem.price shouldBe item.price
+            findItem.quantity shouldBe item.quantity
+        }
     }
 
     context("find Items context") {
-        val item1 = Item("itemA-1", 10000, 10)
-        val item2 = Item("itemA-2", 20000, 20)
-        val item3 = Item("itemB-1", 30000, 30)
+        val item1 = Item(
+            itemName = "itemA-1",
+            price = 10000,
+            quantity = 10)
+        val item2 = Item(
+            itemName = "itemA-2",
+            price = 20000,
+            quantity = 20)
+        val item3 = Item(
+            itemName = "itemB-1",
+            price = 30000,
+            quantity = 30)
 
         itemRepository.save(item1)
         itemRepository.save(item2)

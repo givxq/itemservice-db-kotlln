@@ -15,7 +15,7 @@ import java.util.stream.Collectors
 class MemoryItemRepository : ItemRepository {
     override fun save(item: Item): Item {
         item.id = ++sequence
-        store[item.id] = item
+        store[item.id!!] = item
         return item
     }
 
@@ -38,12 +38,12 @@ class MemoryItemRepository : ItemRepository {
                 if (ObjectUtils.isEmpty(itemName)) {
                     return@Predicate true
                 }
-                item.itemName.contains(itemName?:"")
+                item.itemName!!.contains(itemName?:"")
             }).filter(Predicate<Item> { item: Item ->
                 if (maxPrice == null || maxPrice == 0) {
                     return@Predicate true
                 }
-                item.price <= maxPrice
+                item.price!! <= maxPrice
             })
             .collect(Collectors.toList<Item>())
     }
