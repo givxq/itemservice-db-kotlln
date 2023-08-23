@@ -49,7 +49,7 @@ class JdbcTemplateItemRepositoryV1(
 
     override fun findById(id: Long): Optional<Item> {
         val sql = "select id, item_name, price, quantity from item where id = ?"
-        val item = template.queryForObject(sql, itemRowMapper(), id)
+        val item = template.queryForObject(sql, itemRowMapper(), *arrayOf(id))
         return Optional.of(item!!)
     }
 
@@ -91,6 +91,6 @@ class JdbcTemplateItemRepositoryV1(
         }
 
         logger.info { "sql = $sql" }
-        return template.query(sql, itemRowMapper(), param)
+        return template.query(sql, itemRowMapper(), *param.toTypedArray())
     }
 }

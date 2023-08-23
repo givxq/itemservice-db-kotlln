@@ -21,8 +21,8 @@ class ItemRepositoryTest(
 
     beforeContainer {
         logger.info { "in berforeContainer" }
-        itemRepository as MemoryItemRepository
-        itemRepository.clearStore()
+        if (itemRepository is MemoryItemRepository)
+            itemRepository.clearStore()
     }
 
     context("save/update") {
