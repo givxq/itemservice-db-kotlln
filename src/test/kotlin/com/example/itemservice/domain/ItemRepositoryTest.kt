@@ -3,6 +3,7 @@ package com.example.itemservice.domain
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
+import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV1
 import com.example.itemservice.repository.memory.MemoryItemRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.ShouldSpec
@@ -10,10 +11,12 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 
 val logger = KotlinLogging.logger {  }
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ItemRepositoryTest(
     @Autowired
     val itemRepository: ItemRepository
@@ -23,6 +26,8 @@ class ItemRepositoryTest(
         logger.info { "in berforeContainer" }
         if (itemRepository is MemoryItemRepository)
             itemRepository.clearStore()
+        if (itemRepository is JdbcTemplateItemRepositoryV1)
+            itemRepository.deleteAll()
     }
 
     context("save/update") {
@@ -48,9 +53,9 @@ class ItemRepositoryTest(
             itemRepository.update(itemId, updateParam)
 
             val findItem = itemRepository.findById(itemId).get()
-            findItem.itemName shouldBe item.itemName
-            findItem.price shouldBe item.price
-            findItem.quantity shouldBe item.quantity
+            findItem.itemName shouldBe updateParam.itemName
+            findItem.price shouldBe updateParam.price
+            findItem.quantity shouldBe updateParam.quantity
         }
     }
 
@@ -78,7 +83,8 @@ class ItemRepositoryTest(
             vararg items: Item
         ) {
             val result = itemRepository.findAll(ItemSearchCond(itemName, maxPrice))
-            result.shouldContainExactly(items.toList())
+//            result.shouldContainExactly(items.toList())
+            result shouldBe items
         }
 
         should("둘 다 없음 검증") {

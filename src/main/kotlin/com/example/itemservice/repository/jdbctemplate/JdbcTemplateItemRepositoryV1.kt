@@ -37,7 +37,7 @@ class JdbcTemplateItemRepositoryV1(
     }
 
     override fun update(itemId: Long, updateParam: ItemUpdateDto) {
-        val sql = "update item set item_name=?, price=?, quantity=?"
+        val sql = "update item set item_name=?, price=?, quantity=? where id=?"
         template.update(
             sql,
             updateParam.itemName,
@@ -92,5 +92,10 @@ class JdbcTemplateItemRepositoryV1(
 
         logger.info { "sql = $sql" }
         return template.query(sql, itemRowMapper(), *param.toTypedArray())
+    }
+
+    fun deleteAll() {
+        val sql = "delete item"
+        template.update(sql)
     }
 }
