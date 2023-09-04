@@ -36,7 +36,7 @@ class JdbcTemplateItemRepositoryV1(
     }
 
     override fun update(itemId: Long, updateParam: ItemUpdateDto) {
-        val sql = "update item set item_name=?, price=?, quantity=?"
+        val sql = "update item set item_name=?, price=?, quantity=? where id=?"
         template.update(
             sql,
             updateParam.itemName,
