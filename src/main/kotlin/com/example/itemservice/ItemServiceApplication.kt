@@ -8,6 +8,8 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
+import org.springframework.jdbc.datasource.DriverManagerDataSource
+import javax.sql.DataSource
 
 
 val log = KotlinLogging.logger {}
@@ -25,4 +27,15 @@ fun main(args: Array<String>) {
 fun testDataInit(itemRepository: ItemRepository?): TestDataInit {
 	log.info { "init!!" }
 	return TestDataInit(itemRepository!!)
+}
+
+@Bean
+@Profile("test")
+fun dataSource(): DataSource {
+	log.info { "메모리 데이터베이스 초기화" }
+	val dataSource = DriverManagerDataSource()
+	dataSource.setDriverClassName("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1")
+	dataSource.username = "sa"
+	dataSource.password = ""
+	return dataSource
 }
