@@ -48,7 +48,7 @@ class MemoryItemRepository : ItemRepository {
             .collect(Collectors.toList<Item>())
     }
 
-    fun clearStore() {
+    override fun deleteAll() {
         store.clear()
     }
 

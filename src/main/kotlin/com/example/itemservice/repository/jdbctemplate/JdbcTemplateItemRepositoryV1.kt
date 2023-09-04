@@ -93,7 +93,7 @@ class JdbcTemplateItemRepositoryV1(
         return template.query(sql, itemRowMapper(), *param.toTypedArray())
     }
 
-    fun deleteAll() {
+    override fun deleteAll() {
         val sql = "delete item"
         template.update(sql)
     }

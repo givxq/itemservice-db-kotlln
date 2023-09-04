@@ -12,4 +12,6 @@ interface ItemRepository {
     fun findById(id: Long): Optional<Item>
 
     fun findAll(cond: ItemSearchCond): List<Item>?
+
+    fun deleteAll()
 }

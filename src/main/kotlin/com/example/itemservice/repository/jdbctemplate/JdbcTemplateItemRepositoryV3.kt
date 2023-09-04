@@ -85,4 +85,9 @@ class JdbcTemplateItemRepositoryV3(
         log.info { "sql = $sql" }
         return template.query(sql, param, itemRowMapper())
     }
+
+    override fun deleteAll() {
+        val sql = "delete item"
+        template.update(sql, mapOf<String, Any>())
+    }
 }

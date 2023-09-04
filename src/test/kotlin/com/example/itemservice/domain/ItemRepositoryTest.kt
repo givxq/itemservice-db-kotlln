@@ -4,16 +4,17 @@ import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
 import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV1
+import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV2
+import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV3
 import com.example.itemservice.repository.memory.MemoryItemRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
-val logger = KotlinLogging.logger {  }
+val logger = KotlinLogging.logger { }
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -24,9 +25,14 @@ class ItemRepositoryTest(
 
     beforeContainer {
         logger.info { "in berforeContainer" }
-        if (itemRepository is MemoryItemRepository)
-            itemRepository.clearStore()
-        if (itemRepository is JdbcTemplateItemRepositoryV1)
+        if (when (itemRepository) {
+                is MemoryItemRepository -> true
+                is JdbcTemplateItemRepositoryV1 -> true
+                is JdbcTemplateItemRepositoryV2 -> true
+                is JdbcTemplateItemRepositoryV3 -> true
+                else -> false
+            }
+        )
             itemRepository.deleteAll()
     }
 
@@ -35,7 +41,8 @@ class ItemRepositoryTest(
             val item = Item(
                 itemName = "itemA",
                 price = 10000,
-                quantity = 10)
+                quantity = 10
+            )
             itemRepository.save(item)
             val findItem = itemRepository.findById(item.id!!).get()
             item shouldBe findItem
@@ -45,7 +52,8 @@ class ItemRepositoryTest(
             val item = Item(
                 itemName = "item1",
                 price = 10000,
-                quantity = 10)
+                quantity = 10
+            )
             val savedItem = itemRepository.save(item)
             val itemId = savedItem.id!!
 
@@ -63,15 +71,18 @@ class ItemRepositoryTest(
         val item1 = Item(
             itemName = "itemA-1",
             price = 10000,
-            quantity = 10)
+            quantity = 10
+        )
         val item2 = Item(
             itemName = "itemA-2",
             price = 20000,
-            quantity = 20)
+            quantity = 20
+        )
         val item3 = Item(
             itemName = "itemB-1",
             price = 30000,
-            quantity = 30)
+            quantity = 30
+        )
 
         itemRepository.save(item1)
         itemRepository.save(item2)
