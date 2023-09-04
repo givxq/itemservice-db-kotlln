@@ -2,12 +2,9 @@ package com.example.itemservice
 
 import com.example.itemservice.domain.Item
 import com.example.itemservice.repository.ItemRepository
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-
-val logger = KotlinLogging.logger { }
 
 @Component
 class TestDataInit(
@@ -18,7 +15,7 @@ class TestDataInit(
      */
     @EventListener(ApplicationReadyEvent::class)
     fun initData() {
-        logger.info { "init data" }
+        log.info { "init data" }
         itemRepository.save(
             Item(
                 itemName = "itemA",

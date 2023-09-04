@@ -5,29 +5,26 @@ import com.example.itemservice.log
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.util.*
 import javax.sql.DataSource
 
-class JdbcTemplateItemRepositoryV1(
+class JdbcTemplateItemRepositoryV2(
     dataSource: DataSource
 ) : ItemRepository {
 
-    private val template = JdbcTemplate(dataSource)
+    private val template = NamedParameterJdbcTemplate(dataSource)
     override fun save(item: Item): Item {
-        val sql = "insert into item(item_name, price, quantity) values (?,?,?)"
+        val sql = "insert into item(item_name, price, quantity) " +
+                "values (:itemName,:price,:quantity)"
+        val param = BeanPropertySqlParameterSource(item)
         val keyHolder = GeneratedKeyHolder()
-        template.update({
-            val ps: PreparedStatement = it.prepareStatement(sql, arrayOf("id"))
-            ps.setString(1, item.itemName)
-            ps.setInt(2, item.price!!)
-            ps.setInt(3, item.quantity!!)
-            ps
-        }, keyHolder)
+        template.update(sql, param, keyHolder)
 
         val key = keyHolder.key!!.toLong()
         item.id = key
@@ -36,36 +33,37 @@ class JdbcTemplateItemRepositoryV1(
     }
 
     override fun update(itemId: Long, updateParam: ItemUpdateDto) {
-        val sql = "update item set item_name=?, price=?, quantity=?"
+        val sql = "update item " +
+                "set item_name=:itemName, price=:price, quantity=:quantity" +
+                "where id=:id"
+        val param = MapSqlParameterSource()
+            .addValue("itemNmae", updateParam.itemName)
+            .addValue("price", updateParam.price)
+            .addValue("quantity", updateParam.quantity)
+            .addValue("id", itemId)
+
         template.update(
             sql,
-            updateParam.itemName,
-            updateParam.price,
-            updateParam.quantity,
-            itemId
+            param,
         )
     }
 
     override fun findById(id: Long): Optional<Item> {
-        val sql = "select id, item_name, price, quantity from item where id = ?"
-        val item = template.queryForObject(sql, itemRowMapper(), *arrayOf(id))
+        val sql = "select id, item_name, price, quantity from item where id = :id"
+        val param: MutableMap<String, Any> = mutableMapOf("id" to id)
+        val item = template.queryForObject(sql, param, itemRowMapper())
         return Optional.of(item!!)
     }
 
     private fun itemRowMapper(): RowMapper<Item> {
-        return RowMapper { rs: ResultSet, _: Int ->
-            Item(
-                rs.getLong("id"),
-                rs.getString("item_name"),
-                rs.getInt("price"),
-                rs.getInt("quantity")
-            )
-        }
+        return BeanPropertyRowMapper.newInstance(Item::class.java)
     }
 
     override fun findAll(cond: ItemSearchCond): List<Item>? {
         val itemName = cond.itemName
         val maxPrice = cond.maxPrice
+
+        val param = BeanPropertySqlParameterSource(cond)
 
         var sql = "select id, item_name, price, quantity from item"
 
@@ -74,10 +72,8 @@ class JdbcTemplateItemRepositoryV1(
         }
 
         var andFlag = false
-        val param: MutableList<Any> = mutableListOf()
         if (!itemName.isNullOrEmpty()) {
-            sql += " item_name like concat('%',?,'%')"
-            param.add(itemName)
+            sql += " item_name like concat('%',:itemName,'%')"
             andFlag = true
         }
 
@@ -85,16 +81,10 @@ class JdbcTemplateItemRepositoryV1(
             if (andFlag) {
                 sql += " and"
             }
-            sql += " price <= ?"
-            param.add(maxPrice)
+            sql += " price <= :maxPrice"
         }
 
         log.info { "sql = $sql" }
-        return template.query(sql, itemRowMapper(), *param.toTypedArray())
-    }
-
-    fun deleteAll() {
-        val sql = "delete item"
-        template.update(sql)
+        return template.query(sql, param, itemRowMapper())
     }
 }
