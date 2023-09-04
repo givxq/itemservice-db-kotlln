@@ -10,25 +10,23 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import java.util.*
 import javax.sql.DataSource
 
-class JdbcTemplateItemRepositoryV2(
+class JdbcTemplateItemRepositoryV3(
     dataSource: DataSource
 ) : ItemRepository {
 
     private val template = NamedParameterJdbcTemplate(dataSource)
+    private val jdbcInsert = SimpleJdbcInsert(dataSource)
+        .withTableName("item")
+        .usingGeneratedKeyColumns("id")
+
     override fun save(item: Item): Item {
-        val sql = "insert into item(item_name, price, quantity) " +
-                "values (:itemName,:price,:quantity)"
         val param = BeanPropertySqlParameterSource(item)
-        val keyHolder = GeneratedKeyHolder()
-        template.update(sql, param, keyHolder)
-
-        val key = keyHolder.key!!.toLong()
-        item.id = key
-
+        val key = jdbcInsert.executeAndReturnKey(param)
+        item.id = key.toLong()
         return item
     }
 
