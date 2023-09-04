@@ -3,38 +3,25 @@ package com.example.itemservice.domain
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
-import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV1
-import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV2
-import com.example.itemservice.repository.jdbctemplate.JdbcTemplateItemRepositoryV3
-import com.example.itemservice.repository.memory.MemoryItemRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.Transactional
 
 val logger = KotlinLogging.logger { }
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class ItemRepositoryTest(
-    @Autowired
-    val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val transactionManager: PlatformTransactionManager,
 ) : ShouldSpec({
-
-    beforeContainer {
-        logger.info { "in berforeContainer" }
-        if (when (itemRepository) {
-                is MemoryItemRepository -> true
-                is JdbcTemplateItemRepositoryV1 -> true
-                is JdbcTemplateItemRepositoryV2 -> true
-                is JdbcTemplateItemRepositoryV3 -> true
-                else -> false
-            }
-        )
-            itemRepository.deleteAll()
-    }
+    extension(SpringExtension)
 
     context("save/update") {
         should("save") {
