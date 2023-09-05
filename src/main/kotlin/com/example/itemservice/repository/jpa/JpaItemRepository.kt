@@ -20,7 +20,10 @@ class JpaItemRepository(
     }
 
     override fun update(itemId: Long, updateParam: ItemUpdateDto) {
-        TODO("Not yet implemented")
+        val findItem = em.find(Item::class.java, itemId)
+        findItem.itemName = updateParam.itemName
+        findItem.price = updateParam.price
+        findItem.quantity = updateParam.quantity
     }
 
     override fun findById(id: Long): Optional<Item> {
@@ -28,10 +31,12 @@ class JpaItemRepository(
     }
 
     override fun findAll(cond: ItemSearchCond): List<Item>? {
-        TODO("Not yet implemented")
+        val jpql = "select i from Item i"
+        return em.createQuery(jpql, Item::class.java)
+            .resultList
     }
 
     override fun deleteAll() {
-        TODO("Not yet implemented")
+
     }
 }
