@@ -14,3 +14,11 @@ spring:
 logging:
   level:
     org.springframework.jdbc: debug
+    com.example.itemservice.repository.mybatis: trace
+
+#MyBatis
+mybatis:
+  type-aliases-package: com.example.itemservice.domain
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: mapper/**/*.xml

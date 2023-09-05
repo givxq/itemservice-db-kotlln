@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.2"
 	kotlin("jvm") version "1.8.22"
 	kotlin("plugin.spring") version "1.8.22"
+	kotlin("plugin.jpa") version "1.8.22"
 }
 
 group = "com.example"
@@ -32,7 +33,13 @@ dependencies {
 
 	//h2
 	implementation("com.h2database:h2")
-	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+//	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+
+	//mybatis
+	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2")
+
+	//jpa
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.withType<KotlinCompile> {
@@ -45,3 +52,14 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+noArg {
+	annotation("jakarta.persistence.Entity")
+}
+
+allOpen {
+	annotation("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.MappedSuperclass")
+	annotation("javax.persistence.Embeddable")
+}
+

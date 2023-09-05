@@ -9,7 +9,6 @@ import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
 
 val logger = KotlinLogging.logger { }
@@ -19,7 +18,7 @@ val logger = KotlinLogging.logger { }
 @Transactional
 class ItemRepositoryTest(
     private val itemRepository: ItemRepository,
-    private val transactionManager: PlatformTransactionManager,
+//    private val transactionManager: PlatformTransactionManager,
 ) : ShouldSpec({
     extension(SpringExtension)
 
