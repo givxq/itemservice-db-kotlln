@@ -1,6 +1,6 @@
 package com.example.itemservice
 
-import com.example.itemservice.config.JpaConfig
+import com.example.itemservice.config.JpaConfigV2
 import com.example.itemservice.repository.ItemRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -17,7 +17,8 @@ val log = KotlinLogging.logger {}
 @SpringBootApplication(scanBasePackages = ["com.example.itemservice.web"])
 //@Import(JdbcTemplateV3Config::class)
 //@Import(MyBatisConfig::class)
-@Import(JpaConfig::class)
+//@Import(JpaConfig::class)
+@Import(JpaConfigV2::class)
 class ItemServiceApplication
 
 fun main(args: Array<String>) {

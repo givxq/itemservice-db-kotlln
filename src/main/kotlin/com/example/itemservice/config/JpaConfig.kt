@@ -5,11 +5,13 @@ import com.example.itemservice.repository.jpa.JpaItemRepository
 import com.example.itemservice.service.ItemService
 import com.example.itemservice.service.ItemServiceV1
 import jakarta.persistence.EntityManager
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class JpaConfig(
+    @Autowired
     private val em: EntityManager
 ) {
     @Bean

@@ -1,5 +1,6 @@
 package com.example.itemservice.domain
 
+import com.example.itemservice.log
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
@@ -16,6 +17,7 @@ val logger = KotlinLogging.logger { }
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+//@Rollback(value = false)
 class ItemRepositoryTest(
     private val itemRepository: ItemRepository,
 //    private val transactionManager: PlatformTransactionManager,
@@ -81,6 +83,7 @@ class ItemRepositoryTest(
         ) {
             val result = itemRepository.findAll(ItemSearchCond(itemName, maxPrice))
 //            result.shouldContainExactly(items.toList())
+            log.info { "+++ result : $result" }
             result shouldBe items
         }
 
