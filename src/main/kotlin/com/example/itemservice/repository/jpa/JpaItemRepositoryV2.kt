@@ -33,8 +33,8 @@ class JpaItemRepositoryV2(
         val (itemName, maxPrice) = cond
 
         return when {
-            !itemName.isNullOrEmpty() && maxPrice != null -> repository.findByItemNameContainingAndPriceLessThanEqual(itemName, maxPrice)
-            !itemName.isNullOrEmpty() -> repository.findByItemNameContaining(itemName)
+            !itemName.isNullOrEmpty() && maxPrice != null -> repository.findByItemNameLikeAndPriceLessThanEqual(itemName, maxPrice)
+            !itemName.isNullOrEmpty() -> repository.findByItemNameLike(itemName)
             maxPrice != null -> repository.findByPriceLessThanEqual(maxPrice)
             else -> repository.findAll()
         }

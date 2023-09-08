@@ -93,9 +93,9 @@ class ItemRepositoryTest(
         }
 
         should("itemName 검증") {
-            testItems("itemA", null, item1, item2)
-            testItems("temA", null, item1, item2)
-            testItems("itemB", null, item3)
+            testItems("%itemA%", null, item1, item2)
+            testItems("%temA%", null, item1, item2)
+            testItems("%itemB%", null, item3)
         }
 
         should("maxPrice 검증") {
@@ -103,7 +103,7 @@ class ItemRepositoryTest(
         }
 
         should("둘 다 있음 검증") {
-            testItems("itemA", 10000, item1)
+            testItems("%itemA%", 10000, item1)
         }
     }
 })
