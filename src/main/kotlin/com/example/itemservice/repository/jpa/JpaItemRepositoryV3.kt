@@ -1,9 +1,12 @@
 package com.example.itemservice.repository.jpa
 
 import com.example.itemservice.domain.Item
+import com.example.itemservice.domain.QItem.item
 import com.example.itemservice.repository.ItemRepository
 import com.example.itemservice.repository.ItemSearchCond
 import com.example.itemservice.repository.ItemUpdateDto
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
@@ -35,8 +38,27 @@ class JpaItemRepositoryV3(
 
     override fun findAll(cond: ItemSearchCond): List<Item>? {
         val (itemName, maxPrice) = cond
-        return listOf(Item(1))
+
+        val builder = BooleanBuilder()
+
+        if(!itemName.isNullOrEmpty())
+            builder.and(item.itemName.like("%$itemName%"))
+
+        if(maxPrice != null)
+            builder.and(item.price.loe(maxPrice))
+
+        return query.select(item)
+            .from(item)
+            .where(builder)
+            .fetch()
     }
+
+    private fun likeItemName(itemName: String?): BooleanExpression? {
+        if(!itemName.isNullOrEmpty())
+            return item.itemName.like("%$itemName%")
+        return null
+    }
+
 
     override fun deleteAll() {
         TODO("Not yet implemented")
